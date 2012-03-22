@@ -3183,7 +3183,7 @@
     Dispatcher.paramsFromArgument = function(argument) {
       var resourceNameFromModel;
       resourceNameFromModel = function(model) {
-        return helpers.camelize(helpers.pluralize($functionName(model)), true);
+        return helpers.underscore(helpers.pluralize($functionName(model)));
       };
       if (!this.canInferRoute(argument)) return argument;
       if (argument instanceof Batman.Model || argument instanceof Batman.AssociationProxy) {
@@ -4556,12 +4556,11 @@
       var foundRecord, record;
       record = new this(attrs);
       if (record.isNew()) {
-        record.save(callback);
+        return record.save(callback);
       } else {
         foundRecord = this._mapIdentity(record);
-        callback(void 0, foundRecord);
+        return callback(void 0, foundRecord);
       }
-      return record;
     };
 
     Model._mapIdentity = function(record) {
@@ -4659,20 +4658,15 @@
     };
 
     Model.prototype.set = function(key, value) {
-      var oldValue, result;
+      var oldValue, result, _ref;
       oldValue = this.get(key);
       if (oldValue === value) return;
       result = Model.__super__.set.apply(this, arguments);
-      this._markDirtyKeyAndStorePreviousValue(key, oldValue);
-      return result;
-    };
-
-    Model.prototype._markDirtyKeyAndStorePreviousValue = function(key, oldValue) {
-      var _ref;
       this.dirtyKeys.set(key, oldValue);
       if ((_ref = this.state()) !== 'dirty' && _ref !== 'loading' && _ref !== 'creating') {
-        return this.dirty();
+        this.dirty();
       }
+      return result;
     };
 
     Model.prototype.updateAttributes = function(attrs) {
